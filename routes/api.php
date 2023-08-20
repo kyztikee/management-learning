@@ -23,5 +23,12 @@ Route::prefix('v1')->namespace('App\\Http\\Controllers')->group(function () {
 
     Route::prefix('users')->middleware(['auth:api'])->group(function() {
         Route::get('profile', 'UserController@getProfile');
+        Route::put('profile', 'UserController@updateProfile');
+
+        Route::middleware(['staff_area'])->group(function () {
+            Route::get('lists', 'UserController@getCivilianList');
+            Route::get('details/{user}', 'UserController@getCivilianDetail');
+            Route::put('approval/{user}', 'UserController@profileApproval');
+        });
     });
 });

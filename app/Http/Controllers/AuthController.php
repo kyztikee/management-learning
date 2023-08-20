@@ -35,10 +35,10 @@ class AuthController extends Controller
     {
         $data = $request->validated();
         $detail = Arr::pull($data, 'detail');
-
         DB::beginTransaction();
+
         try {
-            $user = User::create([...$data, 'role' => UserRoleEnum::CIVILIAN]);
+            $user = User::create([...$data, 'role' => UserRoleEnum::CIVILIAN->value]);
             $civilian = Civilian::create([...$detail, 'user_id' => $user->id]);
 
             DB::commit();

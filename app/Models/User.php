@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SearchTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -49,6 +50,19 @@ class User extends Authenticatable
 
     protected $appends = [
         'role_name',
+    ];
+
+    /**
+     * Made for search trait strict filter
+     */
+    protected $searchable = [
+        'id',
+        'role',
+        'name',
+        'email',
+        'civilian-rt',
+        'civilian-rw',
+        'civilian-nik',
     ];
 
     protected function roleName(): Attribute
