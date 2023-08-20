@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\CivilianStatusEnum;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Civilian extends Model
 {
@@ -51,7 +52,10 @@ class Civilian extends Model
         'status',
         'approved_by',
         'approved_at',
-        'status_name'
+        'status_name',
+        'created_at',
+        'updated_at',
+        'approved_by_user'
     ];
 
 
@@ -60,6 +64,11 @@ class Civilian extends Model
         return new Attribute(
             get: fn () => CivilianStatusEnum::getString($this->status)
         );
+    }
+
+    public function approved_by_user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
 }

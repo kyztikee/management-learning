@@ -19,7 +19,7 @@ class UserController extends Controller
 {
     public function getProfile(Request $request)
     {
-        return response()->api(auth()->user()->load('civilian', 'staff'), 200, 'ok', 'Berhasil mendapatkan profil');
+        return response()->api(auth()->user()->load('civilian.approved_by_user', 'staff'), 200, 'ok', 'Berhasil mendapatkan profil');
     }
 
     public function updateProfile(UpdateProfileRequest $request)
@@ -62,7 +62,11 @@ class UserController extends Controller
 
         DB::beginTransaction();
         try {
-            $user->civilian()->update(['status' => $request->status]);
+            $user->civilian()->update([
+                'status' => $request->status,
+                'approved_by' => auth()->user()->id,
+                'approved_at' => date('Y-m-d H:i:s')
+            ]);
 
             DB::commit();
             return response()->api($user->load('civilian'), 200, 'ok', 'Berhasil melakukan approval profil');
@@ -88,6 +92,6 @@ class UserController extends Controller
         if($user->role !== UserRoleEnum::CIVILIAN) {
             return response()->api([], 400, 'error', 'Fitur ini hanya untuk warga');
         }
-        return response()->api($user->load('civilian'), 200, 'ok', 'Berhasil mendapatkan detil warga');
+        return response()->api($user->load('civilian.approved_by_user'), 200, 'ok', 'Berhasil mendapatkan detil warga');
     }
 }
