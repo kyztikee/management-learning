@@ -49,4 +49,12 @@ class StaffController extends Controller
         }
         return response()->api($user->load('staff.parent', 'staff.children'), 200, 'ok', 'Berhasil mendapatkan detil staff');
     }
+
+    public function getSectionArea(Request $request) {
+        $staff = Staff::whereHas('user', function($query) {
+            return $query->where('role', UserRoleEnum::RW);
+        })->get()->load('children');
+
+        return response()->api($staff, 200, 'ok', 'Berhasil mendapatkan data RT/RW');
+    }
 }

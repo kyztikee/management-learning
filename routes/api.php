@@ -21,6 +21,8 @@ Route::prefix('v1')->namespace('App\\Http\\Controllers')->group(function () {
         Route::post('register', 'AuthController@register');
     });
 
+    Route::get('area', 'StaffController@getSectionArea');
+
     // Login required
     Route::middleware(['auth:api'])->group(function () {
         Route::prefix('users')->group(function() {

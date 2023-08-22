@@ -63,6 +63,7 @@ class User extends Authenticatable
         'civilian-rt',
         'civilian-rw',
         'civilian-nik',
+        'staff-section_no'
     ];
 
     protected function roleName(): Attribute
