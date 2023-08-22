@@ -45,7 +45,7 @@ class AuthController extends Controller
         }
 
         $rt = $rw->staff->children->where('section_no', $detail['rt'])->count();
-        if($rt) {
+        if(!$rt) {
             return response()->api([], 400, 'error', 'Data RT tidak ditemukan');
         }
 
