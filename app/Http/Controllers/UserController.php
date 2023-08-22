@@ -78,7 +78,16 @@ class UserController extends Controller
 
     public function getCivilianList(Request $request)
     {
-        $customer = User::where('role', UserRoleEnum::CIVILIAN)->search();
+        $builder = User::where('role', UserRoleEnum::CIVILIAN);
+
+        // For lurah, only civilian with approved data by rt/rw
+        if(auth()->user()->role === UserRoleEnum::LURAH) {
+            $builder = $builder->whereHas('civilian', function($query) {
+                return $query->where('status', CivilianStatusEnum::ACCEPTED);
+            });
+        }
+
+        $customer = $builder->search();
         $result = [
             'count' => $customer->count(),
             'users' => $customer->getResult()->load('civilian'),

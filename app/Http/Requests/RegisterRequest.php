@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Enums\UserRoleEnum;
 
 class RegisterRequest extends FormRequest
 {
@@ -29,8 +31,24 @@ class RegisterRequest extends FormRequest
             'detail.birth_date' => 'required|date',
             'detail.gender' => 'required|string|in:0,1',
             'detail.nik' => 'required|numeric',
-            'detail.rt' => 'required|string|in:001,002,003,004,005,006,007,008,009,010,011,012',
-            'detail.rw' => 'required|string|in:010,011,012',
+            'detail.rt' => [
+                'required',
+                'string',
+                Rule::exists('staff', 'section_no')->where(function($query) {
+                    return $query->whereHas('user', function($detail) {
+                        return $query->where('role', UserRoleEnum::RT);
+                    });
+                })
+            ],
+            'detail.rw' => [
+                'required',
+                'string',
+                Rule::exists('staff', 'section_no')->where(function($query) {
+                    return $query->whereHas('user', function($detail) {
+                        return $query->where('role', UserRoleEnum::RW);
+                    });
+                })
+            ],
             'detail.phone_no' => 'required|string',
             'detail.religion' => 'required|string',
         ];

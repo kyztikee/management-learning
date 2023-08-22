@@ -21,14 +21,25 @@ Route::prefix('v1')->namespace('App\\Http\\Controllers')->group(function () {
         Route::post('register', 'AuthController@register');
     });
 
-    Route::prefix('users')->middleware(['auth:api'])->group(function() {
-        Route::get('profile', 'UserController@getProfile');
-        Route::put('profile', 'UserController@updateProfile');
+    // Login required
+    Route::middleware(['auth:api'])->group(function () {
+        Route::prefix('users')->group(function() {
+            Route::get('profile', 'UserController@getProfile');
+            Route::put('profile', 'UserController@updateProfile');
 
-        Route::middleware(['staff_area'])->group(function () {
-            Route::get('lists', 'UserController@getCivilianList');
-            Route::get('details/{user}', 'UserController@getCivilianDetail');
-            Route::put('approval/{user}', 'UserController@profileApproval');
+            // staff area (rt, rw, lurah)
+            Route::middleware(['staff_area'])->group(function () {
+                Route::get('lists', 'UserController@getCivilianList');
+                Route::get('details/{user}', 'UserController@getCivilianDetail');
+                Route::put('approval/{user}', 'UserController@profileApproval');
+            });
+        });
+
+        // lurah area (lurah only)
+        Route::prefix('staff')->middleware(['lurah_area'])->group(function () {
+            Route::get('lists', 'StaffController@getStaffList');
+            Route::get('details/{user}', 'StaffController@getStaffDetail');
+            Route::post('register', 'StaffController@register');
         });
     });
 });
