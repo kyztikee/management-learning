@@ -17,6 +17,11 @@ class Staff extends Model
         'parent_id',
     ];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Staff::class, 'parent_id', 'user_id');

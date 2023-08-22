@@ -35,11 +35,14 @@ Route::prefix('v1')->namespace('App\\Http\\Controllers')->group(function () {
             });
         });
 
-        // lurah area (lurah only)
-        Route::prefix('staff')->middleware(['lurah_area'])->group(function () {
+        Route::prefix('staff')->group(function () {
             Route::get('lists', 'StaffController@getStaffList');
             Route::get('details/{user}', 'StaffController@getStaffDetail');
-            Route::post('register', 'StaffController@register');
+
+             // lurah area (lurah only)
+            Route::middleware(['lurah_area'])->group(function () {
+                Route::post('register', 'StaffController@register');
+            });
         });
     });
 });
