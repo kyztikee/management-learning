@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('document_submissions', function (Blueprint $table) {
+        Schema::create('document_attachments', function (Blueprint $table) {
             $table->id();
-            $table->tinyInteger('type');
-            $table->foreignId('user_id')->references('id')->on('users');
-            $table->tinyInteger('status');
+            $table->foreignId('document_submission_id')->references('id')->on('document_submissions');
+            $table->string('document_type');
+            $table->string('file_path');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('document_submissions');
+        Schema::dropIfExists('document_attachments');
     }
 };
