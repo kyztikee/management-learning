@@ -50,5 +50,9 @@ Route::prefix('v1')->namespace('App\\Http\\Controllers')->group(function () {
         Route::resource('submissions', DocumentController::class)->only(['store', 'show', 'index']);
         Route::post('submissions/{submission}/attachment', 'DocumentController@storeAttachment');
         Route::delete('submissions/{submission}/attachment/{attachment}', 'DocumentController@deleteAttachment');
+
+        Route::middleware(['staff_area'])->group(function () {
+            Route::post('submissions/{submission}/progress', 'DocumentController@storeDocumentProgress');
+        });
     });
 });
