@@ -137,7 +137,7 @@ class DocumentController extends Controller
         $data = $request->validated();
         DB::beginTransaction();
         try {
-            if($data['file']) {
+            if(isset($data['file'])) {
                 $data['file_path'] = Storage::disk('public')->put('submissions', $data['file']);
             }
 
@@ -157,6 +157,7 @@ class DocumentController extends Controller
             return response()->api($documentProgress->load('user.staff'), 200, 'ok', 'Berhasil melakukan approval dokumen');
         } catch (\Exception $e) {
             DB::rollback();
+            dd($e);
             return response()->api([], 400, 'error', 'Gagal melakukan approval dokumen');
         }
     }
