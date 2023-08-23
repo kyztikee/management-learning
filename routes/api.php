@@ -46,5 +46,9 @@ Route::prefix('v1')->namespace('App\\Http\\Controllers')->group(function () {
                 Route::post('register', 'StaffController@register');
             });
         });
+
+        Route::resource('submissions', DocumentController::class)->only(['store', 'show', 'index']);
+        Route::post('submissions/{submission}/attachment', 'DocumentController@storeAttachment');
+        Route::delete('submissions/{submission}/attachment/{attachment}', 'DocumentController@deleteAttachment');
     });
 });

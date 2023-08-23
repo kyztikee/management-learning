@@ -10,7 +10,7 @@ enum SubmissionStatusEnum: int {
     public static function getString($val): string
     {
         return match ($val) {
-            self::CREATED => 'Baru dibuat',
+            self::CREATED => 'Sedang diproses',
             self::REVISE => 'Memerlukan revisi',
             self::COMPLETE => 'Selesai',
             default => 'Unknown'
