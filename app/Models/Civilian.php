@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\CivilianStatusEnum;
+use App\Enums\GenderEnum;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -26,16 +27,19 @@ class Civilian extends Model
         'rw',
         'phone_no',
         'status',
+        'note',
         'approved_by',
         'approved_at',
     ];
 
     protected $casts = [
         'status' => CivilianStatusEnum::class,
+        'gender' => GenderEnum::class
     ];
 
     protected $appends = [
         'status_name',
+        'gender_name'
     ];
 
 
@@ -44,12 +48,14 @@ class Civilian extends Model
         'birth_place',
         'birth_date',
         'gender',
+        'gender_name',
         'religion',
         'nik',
         'rt',
         'rw',
         'phone_no',
         'status',
+        'note',
         'approved_by',
         'approved_at',
         'status_name',
@@ -63,6 +69,13 @@ class Civilian extends Model
     {
         return new Attribute(
             get: fn () => CivilianStatusEnum::getString($this->status)
+        );
+    }
+
+    protected function genderName(): Attribute
+    {
+        return new Attribute(
+            get: fn () => GenderEnum::getString($this->gender)
         );
     }
 

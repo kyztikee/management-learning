@@ -9,6 +9,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use App\Models\Civilian;
 use App\Enums\UserRoleEnum;
+use App\Enums\CivilianStatusEnum;
 use Illuminate\Support\Arr;
 use DB;
 
@@ -52,7 +53,7 @@ class AuthController extends Controller
         DB::beginTransaction();
         try {
             $user = User::create([...$data, 'role' => UserRoleEnum::CIVILIAN->value]);
-            $civilian = Civilian::create([...$detail, 'user_id' => $user->id]);
+            $civilian = Civilian::create([...$detail, 'user_id' => $user->id, 'status' => CivilianStatusEnum::ON_PROGRESS]);
 
             DB::commit();
             return response()->api([...$user->toArray(), 'civilian' => $civilian], 200, 'ok', 'Berhasil melakukan registrasi');

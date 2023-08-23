@@ -38,7 +38,7 @@ class UserController extends Controller
         try {
             //code...
             auth()->user()->update($data);
-            auth()->user()->civilian()->update($detail);
+            auth()->user()->civilian()->update([...$detail, 'status' => CivilianStatusEnum::ON_PROGRESS]);
             DB::commit();
 
             return response()->api(auth()->user()->load('civilian'), 200, 'ok', 'Berhasil mengubah profil');
@@ -59,11 +59,10 @@ class UserController extends Controller
         }
 
         $data = $request->validated();
-
         DB::beginTransaction();
         try {
             $user->civilian()->update([
-                'status' => $request->status,
+                ...$data,
                 'approved_by' => auth()->user()->id,
                 'approved_at' => date('Y-m-d H:i:s')
             ]);

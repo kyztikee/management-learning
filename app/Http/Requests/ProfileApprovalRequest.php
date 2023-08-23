@@ -23,6 +23,7 @@ class ProfileApprovalRequest extends FormRequest
     {
         return [
             'status' => 'required|in:1,2',
+            'note' => 'string|required_if:status,2',
         ];
     }
 }
