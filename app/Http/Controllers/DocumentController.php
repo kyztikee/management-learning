@@ -73,9 +73,9 @@ class DocumentController extends Controller
                 } else {
                     return $query;
                 }
-            })->search();
+            });
         } else {
-            $builder = DocumentSubmission::where('user_id', auth()->user()->id)->search();
+            $builder = DocumentSubmission::where('user_id', auth()->user()->id);
         }
 
         $documentSubmission = $builder->search();
