@@ -54,15 +54,6 @@ class DocumentController extends Controller
     public function index(Request $request)
     {
         if(auth()->user()->role !== UserRoleEnum::CIVILIAN) {
-            $stage = 0;
-
-            if(auth()->user()->role === UserRoleEnum::RT) {
-                $stage = SubmissionStageEnum::RT->value;
-            } else if (auth()->user()->role === UserRoleEnum::RW) {
-                $stage = SubmissionStageEnum::RW->value;
-            } else if (auth()->user()->role === UserRoleEnum::LURAH) {
-                $stage = SubmissionStageEnum::LURAH->value;
-            }
             $builder = DocumentSubmission::whereHas('user.civilian', function($query) {
                 if(auth()->user()->role === UserRoleEnum::RT) {
                     return $query->where('rt', auth()->user()->staff->section_no);
