@@ -34,6 +34,19 @@ class UserController extends Controller
         $data = $request->validated();
         $detail = Arr::pull($data, 'detail');
 
+        $rw = User::with('staff.children')->where(['role' => UserRoleEnum::RW])->whereHas('staff', function($query) use($detail) {
+            return $query->where('section_no', $detail['rw']);
+        })->first();
+
+        if(!$rw) {
+            return response()->api([], 400, 'error', 'Data RW tidak ditemukan');
+        }
+
+        $rt = $rw->staff->children->where('section_no', $detail['rt'])->count();
+        if(!$rt) {
+            return response()->api([], 400, 'error', 'Data RT tidak ditemukan');
+        }
+
         DB::beginTransaction();
         try {
             //code...
