@@ -63,12 +63,10 @@ class DocumentController extends Controller
             } else if (auth()->user()->role === UserRoleEnum::LURAH) {
                 $stage = SubmissionStageEnum::LURAH->value;
             }
-
-            $builder = DocumentSubmission::where('stage', $stage)
-            ->whereHas('user.civilian', function($query) use($stage) {
-                if($stage === SubmissionStageEnum::RT->value) {
+            $builder = DocumentSubmission::whereHas('user.civilian', function($query) {
+                if(auth()->user()->role === UserRoleEnum::RT) {
                     return $query->where('rt', auth()->user()->staff->section_no);
-                } else if($stage === SubmissionStageEnum::RW->value) {
+                } else if(auth()->user()->role === UserRoleEnum::RW) {
                     return $query->where('rw', auth()->user()->staff->section_no);
                 } else {
                     return $query;
@@ -172,11 +170,9 @@ class DocumentController extends Controller
             } else if(auth()->user()->role === UserRoleEnum::LURAH) {
                 // set status complete
                 $submission->update(['status' => SubmissionStatusEnum::COMPLETE]);
-            }
-
-            if($data['status'] != ProgressStatusEnum::REVISE->value) {
-                // continue to next stage
-                $submission->update(['stage' => $submission->stage->value + 1]);
+            } else {
+                 // continue to next stage
+                 $submission->update(['stage' => $submission->stage->value + 1]);
             }
 
             DB::commit();
