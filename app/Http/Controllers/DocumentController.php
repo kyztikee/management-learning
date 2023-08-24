@@ -73,7 +73,7 @@ class DocumentController extends Controller
 
         $result = [
             'count' => $documentSubmission->count(),
-            'document_submissions' => $documentSubmission->getResult()->load('document_attachments'),
+            'document_submissions' => $documentSubmission->getResult()->load('document_attachments', 'user'),
         ];
 
         return response()->api($result, 200, 'ok', 'Berhasil mendapatkan data pengajuan');
@@ -81,7 +81,7 @@ class DocumentController extends Controller
 
     public function show(Request $request, DocumentSubmission $submission)
     {
-        return response()->api($submission->load('document_attachments', 'document_progresses.user.staff'), 200, 'ok', 'Berhasil mendapatkan detil pengajuan');
+        return response()->api($submission->load('document_attachments', 'document_progresses.user.staff', 'user'), 200, 'ok', 'Berhasil mendapatkan detil pengajuan');
     }
 
     public function storeAttachment(DocumentAttachmentRequest $request, DocumentSubmission $submission)
@@ -126,6 +126,10 @@ class DocumentController extends Controller
 
     public function storeDocumentProgress(DocumentProgressRequest $request, DocumentSubmission $submission)
     {
+        if($submission->status === SubmissionStatusEnum::COMPLETE) {
+            return response()->api([], 400, 'error', 'Status pengajuan ini telah selesai');
+        }
+
         if($submission->stage === SubmissionStageEnum::RT && auth()->user()->role !== UserRoleEnum::RT) {
             return response()->api([], 400, 'error', 'Gagal melakukan approval dokumen, pengajuan ini masih ditahap ' . SubmissionStageEnum::getString($submission->stage));
         } else if ($submission->stage === SubmissionStageEnum::RW && auth()->user()->role !== UserRoleEnum::RW) {
@@ -148,8 +152,13 @@ class DocumentController extends Controller
             ]);
 
             if($data['status'] === ProgressStatusEnum::REVISE->value) {
+                // set status revise
                 $submission->update(['status' => SubmissionStatusEnum::REVISE]);
+            } else if(auth()->user()->role === UserRoleEnum::LURAH) {
+                // set status complete
+                $submission->update(['status' => SubmissionStatusEnum::COMPLETE]);
             } else {
+                // continue to next stage
                 $submission->update(['stage' => $submission->stage->value + 1]);
             }
 
@@ -157,7 +166,6 @@ class DocumentController extends Controller
             return response()->api($documentProgress->load('user.staff'), 200, 'ok', 'Berhasil melakukan approval dokumen');
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e);
             return response()->api([], 400, 'error', 'Gagal melakukan approval dokumen');
         }
     }

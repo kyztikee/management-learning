@@ -9,6 +9,7 @@ use App\Enums\SubmissionTypeEnum;
 use App\Enums\SubmissionStageEnum;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DocumentSubmission extends Model
 {
@@ -69,5 +70,10 @@ class DocumentSubmission extends Model
     public function document_progresses(): HasMany
     {
         return $this->hasMany(DocumentProgress::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
