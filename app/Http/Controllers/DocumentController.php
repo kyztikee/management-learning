@@ -147,9 +147,9 @@ class DocumentController extends Controller
             return response()->api([], 400, 'error', 'Gagal melakukan approval dokumen, pengajuan ini masih ditahap ' . SubmissionStageEnum::getString($submission->stage));
         }
 
-        if(auth()->user()->role === UserRoleEnum::RT && $submission->user()->civilian->rt !== auth()->user()->staff->section_no) {
+        if(auth()->user()->role === UserRoleEnum::RT && $submission->user->civilian->rt !== auth()->user()->staff->section_no) {
             return response()->api([], 400, 'error', 'RT hanya dapat memproses warganya sendiri');
-        } else if (auth()->user()->role === UserRoleEnum::RW && $submission->user()->civilian->rw !== auth()->user()->staff->section_no) {
+        } else if (auth()->user()->role === UserRoleEnum::RW && $submission->user->civilian->rw !== auth()->user()->staff->section_no) {
             return response()->api([], 400, 'error', 'RW hanya dapat memproses warganya sendiri');
         }
 
@@ -166,13 +166,15 @@ class DocumentController extends Controller
                 'user_id' => auth()->user()->id,
             ]);
 
-            if($data['status'] === ProgressStatusEnum::REVISE->value) {
+            if($data['status'] == ProgressStatusEnum::REVISE->value) {
                 // set status revise
                 $submission->update(['status' => SubmissionStatusEnum::REVISE]);
             } else if(auth()->user()->role === UserRoleEnum::LURAH) {
                 // set status complete
                 $submission->update(['status' => SubmissionStatusEnum::COMPLETE]);
-            } else {
+            }
+
+            if($data['status'] != ProgressStatusEnum::REVISE->value) {
                 // continue to next stage
                 $submission->update(['stage' => $submission->stage->value + 1]);
             }
