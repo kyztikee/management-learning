@@ -71,6 +71,14 @@ class UserController extends Controller
             return response()->api([], 400, 'error', 'Profil akun ini telah diterima ataupun diminta revisi kembali');
         }
 
+        if(auth()->user()->role !== UserRoleEnum::RT) {
+            return response()->api([], 400, 'error', 'Approval akun hanya bisa dilakukan RT');
+        }
+
+        if(auth()->user()->staff()->section_no !== $user->civilian()->rt) {
+            return response()->api([], 400, 'error', 'RT hanya dapat melakukan approval kepada warga sendiri');
+        }
+
         $data = $request->validated();
         DB::beginTransaction();
         try {

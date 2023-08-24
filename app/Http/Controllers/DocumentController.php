@@ -64,7 +64,16 @@ class DocumentController extends Controller
                 $stage = SubmissionStageEnum::LURAH->value;
             }
 
-            $builder = DocumentSubmission::where('stage', $stage)->search();
+            $builder = DocumentSubmission::where('stage', $stage)
+            ->whereHas('user.civilian', function($query) use($stage) {
+                if($stage === SubmissionStageEnum::RT->value) {
+                    return $query->where('rt', auth()->user()->staff()->section_no);
+                } else if($stage === SubmissionStageEnum::RW->value) {
+                    return $query->where('rw', auth()->user()->staff()->section_no);
+                } else {
+                    return $query;
+                }
+            })->search();
         } else {
             $builder = DocumentSubmission::where('user_id', auth()->user()->id)->search();
         }
@@ -136,6 +145,12 @@ class DocumentController extends Controller
             return response()->api([], 400, 'error', 'Gagal melakukan approval dokumen, pengajuan ini masih ditahap ' . SubmissionStageEnum::getString($submission->stage));
         } else if ($submission->stage === SubmissionStageEnum::LURAH && auth()->user()->role !== UserRoleEnum::LURAH) {
             return response()->api([], 400, 'error', 'Gagal melakukan approval dokumen, pengajuan ini masih ditahap ' . SubmissionStageEnum::getString($submission->stage));
+        }
+
+        if(auth()->user()->role === UserRoleEnum::RT && $submission->user()->civilian()->rt !== auth()->user()->staff()->section_no) {
+            return response()->api([], 400, 'error', 'RT hanya dapat memproses warganya sendiri');
+        } else if (auth()->user()->role === UserRoleEnum::RW && $submission->user()->civilian()->rw !== auth()->user()->staff()->section_no) {
+            return response()->api([], 400, 'error', 'RW hanya dapat memproses warganya sendiri');
         }
 
         $data = $request->validated();
